@@ -26,8 +26,8 @@ export type StickyNote = {
 
 export type StickyNoteSummary = Omit<StickyNote, "html" | "text"> & { text: string };
 export type NotePatch = Partial<Pick<StickyNote, "html" | "text" | "color" | "pinned">>;
-export const STICKY_NOTES_CHANGED_EVENT = "dotime-sticky-notes-changed";
-const BROWSER_STORAGE_KEY = "dotime-sticky-notes-v1";
+export const STICKY_NOTES_CHANGED_EVENT = "betime-sticky-notes-changed";
+const BROWSER_STORAGE_KEY = "betime-sticky-notes-v1";
 
 function loadBrowserNotes(): StickyNote[] {
   const raw = localStorage.getItem(BROWSER_STORAGE_KEY);

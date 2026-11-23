@@ -317,7 +317,7 @@ export function PinnedSubtasksWindow() {
         ]);
 
         let receivedUpdate = false;
-        cleanup = await listen<string>(`dotime-pinned-subtasks-${slot}`, (event) => {
+        cleanup = await listen<string>(`betime-pinned-subtasks-${slot}`, (event) => {
           if (cancelled) return;
           receivedUpdate = true;
           const nextGroup = parseMiniSubtasksGroup(event.payload);
@@ -399,10 +399,10 @@ export function PinnedSubtasksWindow() {
     };
 
     window.addEventListener("storage", handleStorage);
-    window.addEventListener("dotime-app-data-updated", handleAppDataUpdated);
+    window.addEventListener("betime-app-data-updated", handleAppDataUpdated);
     return () => {
       window.removeEventListener("storage", handleStorage);
-      window.removeEventListener("dotime-app-data-updated", handleAppDataUpdated);
+      window.removeEventListener("betime-app-data-updated", handleAppDataUpdated);
     };
   }, [slot]);
 

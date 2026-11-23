@@ -102,11 +102,18 @@ describe("recoverable app backups", () => {
     expect(result).toMatchObject({ ok: true, backup: { legacy: true, templates: null } });
   });
 
-  it.each(["doTime 待办导出文档", '{"format":"dotime-backup","version":99}', '{"format":"another-app"}'])(
+  it.each(["betime 待办导出文档", '{"format":"betime-backup","version":99}', '{"format":"another-app"}'])(
     "rejects text documents and unsupported backup formats (%s)", (text) => {
       expect(parseAppBackup(text).ok).toEqual(false);
     },
   );
+
+  it("accepts dotime-backup JSON exported from doTime", async () => {
+    const backup = await createAppBackup(createAppDataDocument([todo()], []), []);
+    const legacyBackup = { ...backup, format: "dotime-backup" };
+    const result = parseAppBackup(JSON.stringify(legacyBackup));
+    expect(result.ok).toEqual(true);
+  });
 
   it("rejects dates that cannot be displayed in the restore preview", async () => {
     const backup = await createAppBackup(createAppDataDocument([], []), []);

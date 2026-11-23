@@ -337,7 +337,7 @@ describe("app data storage", () => {
       createAppDataDocument([first, second], []),
     );
 
-    expect(text).toContain("doTime 待办文档\r\n");
+    expect(text).toContain("betime 待办文档\r\n");
     expect(text).toContain("日期：2026/7/29（2 个待办）");
     expect(text).toContain("标题：第一项");
     expect(text).toContain("标题：第二项");

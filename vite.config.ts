@@ -18,15 +18,15 @@ export default defineConfig(async () => ({
   clearScreen: false,
   // 2. tauri expects a fixed port, fail if that port is not available
   server: {
-    // 避开本机已占用的 1420（如 code2img），改用 1422
-    port: 1422,
+    // 避开本机已占用的 1420/1422，改用 1424
+    port: 1424,
     strictPort: true,
     host: host || false,
     hmr: host
       ? {
           protocol: "ws",
           host,
-          port: 1423,
+          port: 1425,
         }
       : undefined,
     watch: {

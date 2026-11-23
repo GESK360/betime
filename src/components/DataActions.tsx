@@ -58,7 +58,7 @@ function createExportFileName(scopeDate: string | null, now = new Date()): strin
     String(now.getSeconds()).padStart(2, "0"),
   ].join("");
   const scope = scopeDate == null ? `all-${exportDate}` : scopeDate;
-  return `doTime-todos-${scope}-${time}.txt`;
+  return `betime-todos-${scope}-${time}.txt`;
 }
 
 export function DataActions({
@@ -213,7 +213,7 @@ export function DataActions({
     try {
       const text = await onExportBackup();
       const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-      downloadText(text, `doTime-backup-${stamp}.json`, "备份已导出，可用于恢复全部待办、模板和图片。", "application/json;charset=utf-8");
+      downloadText(text, `betime-backup-${stamp}.json`, "备份已导出，可用于恢复全部待办、模板和图片。", "application/json;charset=utf-8");
     } catch (error) {
       showStatus({ kind: "error", message: `备份未导出：${error instanceof Error ? error.message : String(error)}` });
     } finally {
@@ -495,7 +495,7 @@ export function DataActions({
             className="data-actions__file-input"
             type="file"
             accept="application/json,.json"
-            aria-label="选择 doTime 备份文件"
+            aria-label="选择 betime 备份文件"
             onChange={(event) =>
               void handleImportFile(event.currentTarget.files?.[0])
             }

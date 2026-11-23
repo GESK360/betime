@@ -2,7 +2,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import type { PinnedWindowFrame, PinnedWindowFrameTarget } from "./pinnedWindowFrame";
 
-export const PINNED_LAYOUT_UPDATED_EVENT = "dotime-pinned-layout-updated";
+export const PINNED_LAYOUT_UPDATED_EVENT = "betime-pinned-layout-updated";
 
 type Placement = {
   slot: string;

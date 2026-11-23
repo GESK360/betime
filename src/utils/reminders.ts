@@ -1,9 +1,9 @@
 import type { Todo } from "../types";
 
-export const ACTIVE_REMINDER_STORAGE_KEY = "dotime-active-reminder-v1";
-export const REMINDER_GROUP_EVENT = "dotime-reminder-group";
-export const REMINDER_ACTION_EVENT = "dotime-reminder-action";
-export const REMINDER_FIRED_EVENT = "dotime-reminder-fired";
+export const ACTIVE_REMINDER_STORAGE_KEY = "betime-active-reminder-v1";
+export const REMINDER_GROUP_EVENT = "betime-reminder-group";
+export const REMINDER_ACTION_EVENT = "betime-reminder-action";
+export const REMINDER_FIRED_EVENT = "betime-reminder-fired";
 
 export type ReminderActionPayload = {
   action: "dismiss" | "snooze";

@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { emit, listen } from "@tauri-apps/api/event";
 
-export const WINDOW_OPACITY_STORAGE_KEY = "dotime:window-opacity";
-export const WINDOW_OPACITY_CHANGE_EVENT = "dotime-window-opacity-changed";
+export const WINDOW_OPACITY_STORAGE_KEY = "betime:window-opacity";
+export const WINDOW_OPACITY_CHANGE_EVENT = "betime-window-opacity-changed";
 export const WINDOW_OPACITY_MIN = 0.35;
 export const WINDOW_OPACITY_MAX = 1;
 export const WINDOW_OPACITY_STEP = 0.05;

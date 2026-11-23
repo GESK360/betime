@@ -1,4 +1,4 @@
-export const APP_DATA_UPDATED_EVENT = "dotime-app-data-updated";
+export const APP_DATA_UPDATED_EVENT = "betime-app-data-updated";
 
 export async function emitAppDataUpdated() {
   const { emit } = await import("@tauri-apps/api/event");

@@ -8,7 +8,7 @@ import type {
 import { normalizeReminderTime } from "../utils/reminders";
 import type { StorageLike } from "./appData";
 
-export const TASK_TEMPLATE_STORAGE_KEY = "dotime-task-templates-v1";
+export const TASK_TEMPLATE_STORAGE_KEY = "betime-task-templates-v1";
 export const TASK_TEMPLATE_BACKUP_KEY = `${TASK_TEMPLATE_STORAGE_KEY}-backup`;
 export const TASK_TEMPLATE_DATA_VERSION = 1 as const;
 

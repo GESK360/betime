@@ -5,7 +5,7 @@ use std::io::Write;
 use std::path::{Path, PathBuf};
 
 pub(super) const DIRECTORY_NAME: &str = "sticky-notes";
-const FORMAT_MARKER: &str = "dotime-sticky-notes-v1";
+const FORMAT_MARKER: &str = "betime-sticky-notes-v1";
 
 pub(super) struct NoteRepository {
     pub root: PathBuf,

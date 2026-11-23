@@ -98,7 +98,7 @@ export function useAppUpdates() {
     try {
       await openUpdateReleasePage(info?.releaseUrl);
     } catch {
-      if (mounted.current) setError("无法打开浏览器，请访问 github.com/996wuxian/DoTime/releases 下载。");
+      if (mounted.current) setError("无法打开浏览器，请访问 github.com/GESK360/betime/releases 下载。");
     }
   }, [info]);
 

@@ -9,10 +9,10 @@ use std::sync::Mutex;
 use std::time::{Duration, Instant};
 use tauri::{Emitter, Manager};
 
-const LATEST_RELEASE_API: &str = "https://api.github.com/repos/996wuxian/DoTime/releases/latest";
-const RELEASE_PAGE_PREFIX: &str = "https://github.com/996wuxian/DoTime/releases/tag/";
-const ASSET_URL_PREFIX: &str = "https://github.com/996wuxian/DoTime/releases/download/";
-const DOWNLOAD_PROGRESS_EVENT: &str = "dotime-update-download-progress";
+const LATEST_RELEASE_API: &str = "https://api.github.com/repos/GESK360/betime/releases/latest";
+const RELEASE_PAGE_PREFIX: &str = "https://github.com/GESK360/betime/releases/tag/";
+const ASSET_URL_PREFIX: &str = "https://github.com/GESK360/betime/releases/download/";
+const DOWNLOAD_PROGRESS_EVENT: &str = "betime-update-download-progress";
 
 #[derive(Default)]
 pub struct UpdateState {
@@ -72,7 +72,7 @@ pub struct DownloadedUpdate {
 
 fn http_client(timeout: Duration) -> Result<Client, String> {
     Client::builder()
-        .user_agent(concat!("doTime/", env!("CARGO_PKG_VERSION")))
+        .user_agent(concat!("betime/", env!("CARGO_PKG_VERSION")))
         .connect_timeout(Duration::from_secs(15))
         .timeout(timeout)
         .https_only(true)
@@ -200,7 +200,7 @@ pub async fn check_for_updates(app: tauri::AppHandle) -> Result<UpdateInfo, Stri
 fn download_directory(app: &tauri::AppHandle) -> Result<PathBuf, String> {
     app.path()
         .download_dir()
-        .map(|directory| directory.join("doTime"))
+        .map(|directory| directory.join("betime"))
         .map_err(|_| "无法访问下载目录，请前往 GitHub 手动下载。".into())
 }
 
@@ -368,7 +368,7 @@ pub fn open_update_download_directory(app: tauri::AppHandle) -> Result<(), Strin
     let result = Command::new("xdg-open").arg(&directory).spawn();
     result
         .map(|_| ())
-        .map_err(|_| "无法打开下载目录，请在系统下载目录中的 doTime 文件夹查看安装包。".into())
+        .map_err(|_| "无法打开下载目录，请在系统下载目录中的 betime 文件夹查看安装包。".into())
 }
 
 #[cfg(test)]
@@ -394,8 +394,8 @@ mod tests {
             draft: false,
             prerelease: false,
             assets: vec![
-                asset("doTime_1.8.0_x64_en-US.msi"),
-                asset("doTime_1.8.0_x64-setup.exe"),
+                asset("betime_1.8.0_x64_en-US.msi"),
+                asset("betime_1.8.0_x64-setup.exe"),
             ],
         }
     }
@@ -447,23 +447,23 @@ mod tests {
         .unwrap();
         assert_eq!(
             result.info.asset_name.as_deref(),
-            Some("doTime_1.8.0_x64-setup.exe")
+            Some("betime_1.8.0_x64-setup.exe")
         );
     }
 
     #[test]
     fn never_selects_an_installer_for_the_wrong_architecture_or_source_archive() {
         assert_eq!(
-            installer_rank("doTime_1.8.0_x86_64-setup.exe", "windows", "x86"),
+            installer_rank("betime_1.8.0_x86_64-setup.exe", "windows", "x86"),
             None
         );
         assert_eq!(
-            installer_rank("doTime_1.8.0_x64-setup.exe", "windows", "aarch64"),
+            installer_rank("betime_1.8.0_x64-setup.exe", "windows", "aarch64"),
             None
         );
         assert_eq!(installer_rank("source_x64.zip", "windows", "x86_64"), None);
         assert_eq!(
-            installer_rank("doTime_1.8.0_arm64-setup.exe", "windows", "aarch64"),
+            installer_rank("betime_1.8.0_arm64-setup.exe", "windows", "aarch64"),
             Some(0)
         );
         let result = inspect_release(
@@ -485,7 +485,7 @@ mod tests {
     fn rejects_unsafe_file_names_and_download_sources() {
         assert!(!safe_asset(&asset("../other_x64-setup.exe")));
         assert!(!safe_asset(&asset("other\\file_x64-setup.exe")));
-        let mut external = asset("doTime_x64-setup.exe");
+        let mut external = asset("betime_x64-setup.exe");
         external.browser_download_url = "https://example.com/file.exe".into();
         assert!(!safe_asset(&external));
     }
@@ -497,7 +497,7 @@ mod tests {
         copy_installer(
             &b"abc"[..],
             &mut saved,
-            &asset("doTime_x64-setup.exe"),
+            &asset("betime_x64-setup.exe"),
             |event| events.push(event),
         )
         .unwrap();
@@ -511,7 +511,7 @@ mod tests {
     fn rejects_truncated_oversized_and_corrupted_downloads() {
         for content in [&b"ab"[..], &b"abcd"[..], &b"abd"[..]] {
             assert!(
-                copy_installer(content, Vec::new(), &asset("doTime_x64-setup.exe"), |_| {})
+                copy_installer(content, Vec::new(), &asset("betime_x64-setup.exe"), |_| {})
                     .is_err()
             );
         }

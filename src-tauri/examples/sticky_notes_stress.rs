@@ -1,4 +1,4 @@
-//! Hidden WebView2 stress fixture. Never reads the user's doTime data directory.
+//! Hidden WebView2 stress fixture. Never reads the user's betime data directory.
 //! See scripts/benchmark-sticky-notes.ps1 for build and measurement instructions.
 #![allow(dead_code)]
 
@@ -15,9 +15,9 @@ mod sticky_notes;
 static READY: AtomicUsize = AtomicUsize::new(0);
 
 fn data_directory(_: &tauri::AppHandle) -> Result<PathBuf, String> {
-    std::env::var_os("DOTIME_BENCH_DIR")
+    std::env::var_os("BETIME_BENCH_DIR")
         .map(PathBuf::from)
-        .ok_or_else(|| "DOTIME_BENCH_DIR is required; production data is never used".into())
+        .ok_or_else(|| "BETIME_BENCH_DIR is required; production data is never used".into())
 }
 
 #[tauri::command]
@@ -109,13 +109,13 @@ fn seed(directory: &std::path::Path, count: usize) {
 }
 
 fn main() {
-    let count: usize = std::env::var("DOTIME_BENCH_COUNT")
+    let count: usize = std::env::var("BETIME_BENCH_COUNT")
         .unwrap_or_else(|_| "1".into())
         .parse()
         .unwrap();
     assert!((1..=30).contains(&count));
     let directory =
-        PathBuf::from(std::env::var_os("DOTIME_BENCH_DIR").expect("test directory required"));
+        PathBuf::from(std::env::var_os("BETIME_BENCH_DIR").expect("test directory required"));
     seed(&directory, count);
     phase(&directory, "startup");
     let context = tauri::generate_context!();

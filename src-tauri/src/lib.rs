@@ -34,8 +34,8 @@ const PINNED_SUBTASKS_ITEM_COLLAPSED_HEIGHT: f64 = 46.0;
 const PINNED_SUBTASKS_LIST_GAP: f64 = 8.0;
 const PINNED_SUBTASKS_LIST_PADDING: f64 = 8.0;
 const PINNED_SUBTASKS_MAX_COLLAPSED_ITEMS: usize = 3;
-const PINNED_TODOS_UPDATED_EVENT: &str = "dotime-pinned-todos-updated";
-const PINNED_LAYOUT_UPDATED_EVENT: &str = "dotime-pinned-layout-updated";
+const PINNED_TODOS_UPDATED_EVENT: &str = "betime-pinned-todos-updated";
+const PINNED_LAYOUT_UPDATED_EVENT: &str = "betime-pinned-layout-updated";
 const CLIPBOARD_POLL_INTERVAL_MS: u64 = 800;
 const CLIPBOARD_MAX_IMAGE_BYTES: usize = 12 * 1024 * 1024;
 const CLIPBOARD_HISTORY_LIMIT: usize = 100;
@@ -729,7 +729,7 @@ fn close_reminder_window(window: tauri::Window) -> Result<(), String> {
 fn close_clipboard_window(app: tauri::AppHandle, window: tauri::Window) -> Result<(), String> {
     stop_clipboard_monitor(&app);
     window.hide().map_err(|error| error.to_string())?;
-    let _ = app.emit("dotime-clipboard-closed", ());
+    let _ = app.emit("betime-clipboard-closed", ());
     Ok(())
 }
 
@@ -740,7 +740,7 @@ fn close_mini_subtasks_window(
 ) -> Result<(), String> {
     *state.0.lock().map_err(|error| error.to_string())? = None;
     hide_mini_subtasks_windows(&app);
-    let _ = app.emit("dotime-mini-subtasks-closed", serde_json::json!({}));
+    let _ = app.emit("betime-mini-subtasks-closed", serde_json::json!({}));
     Ok(())
 }
 
@@ -753,7 +753,7 @@ async fn show_clipboard_window(app: tauri::AppHandle) -> Result<(), String> {
             "clipboard",
             WebviewUrl::App("index.html?view=clipboard".into()),
         )
-        .title("doTime 剪贴板")
+        .title("betime 剪贴板")
         .visible(false)
         .decorations(false)
         .transparent(false)
@@ -863,7 +863,7 @@ async fn show_pinned_todo_window(
         .insert(slot.to_string(), PinnedDockOptions::default());
     position_pinned_todo_window(&window, slot)?;
     let _ = app.emit(PINNED_LAYOUT_UPDATED_EVENT, ());
-    let _ = window.emit(format!("dotime-pinned-todo-{slot}").as_str(), pinned_todo);
+    let _ = window.emit(format!("betime-pinned-todo-{slot}").as_str(), pinned_todo);
     let _ = app.emit(PINNED_TODOS_UPDATED_EVENT, ());
     Ok(slot.to_string())
 }
@@ -1006,7 +1006,7 @@ fn remove_pinned_todo(
         .remove(&slot);
     if let Some(window) = app.get_webview_window(&window_label) {
         window.hide().map_err(|error| error.to_string())?;
-        let _ = window.emit(format!("dotime-pinned-todo-{slot}").as_str(), "");
+        let _ = window.emit(format!("betime-pinned-todo-{slot}").as_str(), "");
     }
     app.state::<PinnedDockState>()
         .0
@@ -1111,7 +1111,7 @@ async fn show_pinned_subtasks_window(
     let _ = restore_window_opacity(&window);
     let _ = window.set_background_color(Some(Color(0, 0, 0, 0)));
     let _ = window.emit(
-        format!("dotime-pinned-subtasks-{slot}").as_str(),
+        format!("betime-pinned-subtasks-{slot}").as_str(),
         subtasks_group,
     );
     Ok(())
@@ -1170,7 +1170,7 @@ fn close_pinned_subtasks_window(
     let window_label = pinned_subtasks_window_label(slot.parse::<usize>().unwrap_or(0));
     if let Some(window) = app.get_webview_window(&window_label) {
         window.hide().map_err(|error| error.to_string())?;
-        let _ = window.emit(format!("dotime-pinned-subtasks-{slot}").as_str(), "");
+        let _ = window.emit(format!("betime-pinned-subtasks-{slot}").as_str(), "");
     }
     if let Some(option) = app
         .state::<PinnedDockState>()
@@ -1195,7 +1195,7 @@ fn sync_pinned_subtasks_window_with_parent(
     if let Some(window) = app.get_webview_window(&label) {
         window
             .emit(
-                format!("dotime-pinned-subtasks-moving-{slot}").as_str(),
+                format!("betime-pinned-subtasks-moving-{slot}").as_str(),
                 serde_json::json!({ "moving": moving }),
             )
             .map_err(|error| error.to_string())?;
@@ -1339,7 +1339,7 @@ fn show_reminder_window_inner(
             "reminder",
             WebviewUrl::App("index.html?view=reminder".into()),
         )
-        .title("doTime 提醒")
+        .title("betime 提醒")
         .visible(false)
         .decorations(false)
         .transparent(true)
@@ -1367,7 +1367,7 @@ fn show_reminder_window_inner(
     let _ = window.unminimize();
     window.show().map_err(|error| error.to_string())?;
     let _ = window.set_focus();
-    let _ = window.emit("dotime-reminder-group", reminder_group);
+    let _ = window.emit("betime-reminder-group", reminder_group);
     Ok(())
 }
 
@@ -1390,7 +1390,7 @@ fn show_mini_subtasks_window_inner(
             "mini-subtasks",
             WebviewUrl::App("index.html?view=mini-subtasks".into()),
         )
-        .title("doTime 子待办")
+        .title("betime 子待办")
         .visible(false)
         .decorations(false)
         .transparent(true)
@@ -1420,7 +1420,7 @@ fn show_mini_subtasks_window_inner(
         let _ = window.set_focus();
         restore_window_opacity(&window)?;
     }
-    let _ = window.emit("dotime-mini-subtasks-group", subtasks_group);
+    let _ = window.emit("betime-mini-subtasks-group", subtasks_group);
 
     hide_extra_mini_subtasks_windows(app, 1);
     Ok(())
@@ -1719,7 +1719,7 @@ fn run_reminder_scheduler(app: tauri::AppHandle, receiver: Receiver<Vec<Schedule
                 match show_reminder_window_inner(&app, reminder_group) {
                     Ok(()) => {
                         let _ = app.emit(
-                            "dotime-reminder-fired",
+                            "betime-reminder-fired",
                             serde_json::json!({ "ids": fired_ids, "firedAt": now }),
                         );
                     }
@@ -1799,7 +1799,7 @@ fn run_clipboard_monitor(app: tauri::AppHandle, receiver: Receiver<()>) {
                     }
                     save_clipboard_history_async(&state);
                 }
-                let _ = app.emit("dotime-clipboard-changed", outgoing_snapshot);
+                let _ = app.emit("betime-clipboard-changed", outgoing_snapshot);
             }
         }
     }
@@ -3057,11 +3057,11 @@ pub fn run() {
             thread::spawn(move || run_reminder_scheduler(reminder_app, reminder_schedule_receiver));
 
             let show_item = MenuItem::with_id(app, "show-main", "显示主窗口", true, None::<&str>)?;
-            let quit_item = MenuItem::with_id(app, "quit", "退出 doTime", true, None::<&str>)?;
+            let quit_item = MenuItem::with_id(app, "quit", "退出 betime", true, None::<&str>)?;
             let tray_menu = Menu::with_items(app, &[&show_item, &quit_item])?;
 
             let mut tray_builder = TrayIconBuilder::with_id("main-tray")
-                .tooltip("doTime")
+                .tooltip("betime")
                 .menu(&tray_menu)
                 .show_menu_on_left_click(false)
                 .on_menu_event(|app, event| match event.id().as_ref() {

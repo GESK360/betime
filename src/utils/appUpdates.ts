@@ -1,8 +1,8 @@
 import { invoke } from "@tauri-apps/api/core";
 
-export const APP_REPOSITORY_URL = "https://github.com/996wuxian/DoTime";
+export const APP_REPOSITORY_URL = "https://github.com/GESK360/betime";
 export const APP_DOWNLOAD_URL = `${APP_REPOSITORY_URL}/releases`;
-export const UPDATE_PROGRESS_EVENT = "dotime-update-download-progress";
+export const UPDATE_PROGRESS_EVENT = "betime-update-download-progress";
 
 export type UpdateInfo = {
   currentVersion: string;

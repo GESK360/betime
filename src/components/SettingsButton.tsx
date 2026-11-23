@@ -214,7 +214,7 @@ function SettingsDialog({ onClose, updates }: {
         <div className="settings-dialog__preview">
           <span>字体预览</span>
           <p>专注当下，把时间留给重要的事。</p>
-          <small>doTime · 今天也要一步一步来 0123456789</small>
+          <small>betime · 今天也要一步一步来 0123456789</small>
         </div>
         <AppUpdateSettings updates={updates} />
       </div>

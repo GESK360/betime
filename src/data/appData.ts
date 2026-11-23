@@ -19,10 +19,10 @@ import { MAX_TODO_IMAGES } from "../utils/todoImages";
 import { formatDisplayDate, formatDurationHuman } from "../utils/time";
 
 export const APP_DATA_VERSION = 2 as const;
-export const APP_DATA_STORAGE_KEY = "dotime-app-data-v2";
-export const LEGACY_TODO_STORAGE_KEY = "dotime-todos-v1";
+export const APP_DATA_STORAGE_KEY = "betime-app-data-v2";
+export const LEGACY_TODO_STORAGE_KEY = "betime-todos-v1";
 export const LEGACY_MANUAL_SORT_DATES_STORAGE_KEY =
-  "dotime-manual-sort-dates-v1";
+  "betime-manual-sort-dates-v1";
 
 const BACKUP_COUNT = 3;
 const DATE_KEY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
@@ -750,7 +750,7 @@ export function exportAppDataAsText(
   }
 
   const header = [
-    "doTime 待办文档",
+    "betime 待办文档",
     `导出时间：${DATE_TIME_FORMATTER.format(new Date())}`,
     `导出范围：${date == null ? "全部日期" : formatDisplayDate(date)}`,
     `待办总数：${orderedTodos.length}`,

@@ -7,7 +7,7 @@ use std::sync::Mutex;
 use tauri::Manager;
 
 const DAY_MS: u64 = 24 * 60 * 60 * 1000;
-const BACKUP_MARKER: &str = "dotime-auto-backup-v1";
+const BACKUP_MARKER: &str = "betime-auto-backup-v1";
 static BACKUP_LOCK: Mutex<()> = Mutex::new(());
 static NEXT_FILE_ID: AtomicU64 = AtomicU64::new(0);
 
@@ -128,7 +128,7 @@ fn status(settings: BackupSettings, default_directory: &Path) -> BackupStatus {
 }
 
 fn managed_file_time(name: &str) -> Option<u64> {
-    let stem = name.strip_prefix("doTime-auto-")?.strip_suffix(".json")?;
+    let stem = name.strip_prefix("betime-auto-")?.strip_suffix(".json")?;
     let (time, sequence) = stem.split_once('-')?;
     if time.is_empty()
         || sequence.is_empty()
@@ -205,8 +205,10 @@ fn write_backup(
     let attempt = || -> Result<PathBuf, String> {
         let mut document: serde_json::Value =
             serde_json::from_str(content).map_err(|_| "备份内容不是有效的 JSON。".to_owned())?;
-        if document["format"] != "dotime-backup"
-            || document["version"] != 1
+        if !matches!(
+            document["format"].as_str(),
+            Some("betime-backup" | "dotime-backup")
+        ) || document["version"] != 1
             || !document["appData"]["todos"].is_array()
             || !document["templates"].is_array()
         {
@@ -219,7 +221,7 @@ fn write_backup(
         fs::create_dir_all(&directory).map_err(|error| format!("备份目录不可用：{error}"))?;
         let directory = fs::canonicalize(directory).map_err(|error| error.to_string())?;
         let sequence = NEXT_FILE_ID.fetch_add(1, Ordering::Relaxed);
-        let path = directory.join(format!("doTime-auto-{now}-{sequence}.json"));
+        let path = directory.join(format!("betime-auto-{now}-{sequence}.json"));
         atomic_write(&path, &bytes, false)?;
         Ok(path)
     };
@@ -326,7 +328,7 @@ mod tests {
     use super::*;
 
     fn content() -> String {
-        serde_json::json!({ "format": "dotime-backup", "version": 1, "exportedAt": 1,
+        serde_json::json!({ "format": "betime-backup", "version": 1, "exportedAt": 1,
             "appData": { "version": 2, "todos": [], "trash": [], "categoryDividers": [], "manualSortDates": [] }, "templates": [] }).to_string()
     }
 
@@ -339,7 +341,7 @@ mod tests {
         assert!(first.created);
         let file = PathBuf::from(first.status.settings.last_backup_file.unwrap());
         let document: serde_json::Value = serde_json::from_slice(&fs::read(file).unwrap()).unwrap();
-        assert_eq!(document["format"], "dotime-backup");
+        assert_eq!(document["format"], "betime-backup");
         assert_eq!(document["automaticBackup"]["kind"], BACKUP_MARKER);
         assert!(
             !write_backup(&config, &directory, &content(), false, DAY_MS + 1)
@@ -370,11 +372,11 @@ mod tests {
         assert_eq!(fs::read_dir(&directory).unwrap().count(), 7);
         fs::write(directory.join("manual-export.json"), "keep").unwrap();
         fs::write(
-            directory.join("doTime-auto-1-100.json"),
+            directory.join("betime-auto-1-100.json"),
             "{\"userFile\":true}",
         )
         .unwrap();
-        fs::create_dir(directory.join("doTime-auto-2-100.json")).unwrap();
+        fs::create_dir(directory.join("betime-auto-2-100.json")).unwrap();
         let latest = write_backup(&config, &directory, &content(), true, 1).unwrap();
         assert!(Path::new(latest.status.settings.last_backup_file.as_ref().unwrap()).is_file());
         assert_eq!(fs::read_dir(&directory).unwrap().count(), 10);
@@ -382,7 +384,7 @@ mod tests {
             fs::read_to_string(directory.join("manual-export.json")).unwrap(),
             "keep"
         );
-        assert!(directory.join("doTime-auto-2-100.json").is_dir());
+        assert!(directory.join("betime-auto-2-100.json").is_dir());
     }
 
     #[test]
@@ -475,10 +477,10 @@ mod tests {
         })
         .is_err());
         for name in [
-            "../doTime-auto-1-1.json",
-            "doTime-auto-1-../x.json",
+            "../betime-auto-1-1.json",
+            "betime-auto-1-../x.json",
             "manual.json",
-            "doTime-auto-1-1.tmp",
+            "betime-auto-1-1.tmp",
         ] {
             assert!(managed_file_time(name).is_none());
         }

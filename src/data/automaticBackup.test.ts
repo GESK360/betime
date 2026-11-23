@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { AUTO_BACKUP_INTERVAL_MS, AUTO_BACKUP_RETRY_MS, createAutomaticBackupRunner, formatAutomaticBackupError, isAutomaticBackupDue, type AutoBackupStatus } from "./automaticBackup";
 
 const defaults = (overrides: Partial<AutoBackupStatus> = {}): AutoBackupStatus => ({
-  enabled: true, directory: "D:/DoTime备份", defaultDirectory: "D:/DoTime/data/auto-backups", keepCount: 7,
+  enabled: true, directory: "D:/betime备份", defaultDirectory: "D:/betime/data/auto-backups", keepCount: 7,
   lastSuccessAt: null, lastAttemptAt: null, lastBackupFile: null, lastError: null, lastWarning: null, ...overrides,
 });
 function harness(status = defaults()) {
@@ -10,7 +10,7 @@ function harness(status = defaults()) {
   let restoring = false;
   const read = vi.fn(async () => status);
   const write = vi.fn(async () => ({ status: { ...status, lastSuccessAt: clock }, created: true }));
-  const createSnapshot = vi.fn(async () => '{"format":"dotime-backup"}');
+  const createSnapshot = vi.fn(async () => '{"format":"betime-backup"}');
   const onStatus = vi.fn();
   const onBusy = vi.fn();
   const onError = vi.fn();

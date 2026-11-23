@@ -108,7 +108,7 @@ type ActivePinnedTodo = {
   slot: string;
   todoId: string;
 };
-const APP_AUTHOR = "996wuxian";
+const APP_AUTHOR = "GESK360";
 
 type TodoDragState = {
   pointerId: number;
@@ -939,9 +939,9 @@ function App() {
           refreshPinnedTodoSlots();
           ensurePinnedSubtasksWindows();
         };
-        const unlistenAppData = await listen("dotime-app-data-updated", refresh);
+        const unlistenAppData = await listen("betime-app-data-updated", refresh);
         const unlistenPinnedTodos = await listen(
-          "dotime-pinned-todos-updated",
+          "betime-pinned-todos-updated",
           refresh,
         );
         if (disposed) {
@@ -2156,7 +2156,7 @@ function App() {
         <div className="confirm-dialog__content">
           <div className="confirm-dialog__header">
             <div>
-              <h2 id="about-dialog-title">doTime</h2>
+              <h2 id="about-dialog-title">betime</h2>
               <p className="about-dialog__summary">
                 本地优先的待办、倒计时与耗时追踪工具
               </p>
@@ -2165,7 +2165,7 @@ function App() {
               type="button"
               className="btn btn-ghost btn-icon-only confirm-dialog__close"
               onClick={() => setAboutOpen(false)}
-              aria-label="关闭关于 doTime"
+              aria-label="关闭关于 betime"
               title="关闭"
             >
               <IconClose size={16} />
@@ -2303,7 +2303,7 @@ function App() {
         >
           <img
             src="/logo.png"
-            alt="doTime"
+            alt="betime"
             className="app-logo"
             draggable={false}
             data-tauri-drag-region
@@ -2313,12 +2313,12 @@ function App() {
             className="brand__title-button"
             onClick={() => setAboutOpen(true)}
             aria-label={updates.info?.hasUpdate
-              ? "查看 doTime 关于信息，发现新版本"
-              : "查看 doTime 关于信息"}
-            title="关于 doTime"
+              ? "查看 betime 关于信息，发现新版本"
+              : "查看 betime 关于信息"}
+            title="关于 betime"
           >
             <span className="brand__title-group">
-              <h1 className="brand__title">doTime</h1>
+              <h1 className="brand__title">betime</h1>
               {updates.info?.hasUpdate && (
                 <span className="brand__update-badge" title={`发现新版本 v${updates.info.latestVersion}`}>
                   new

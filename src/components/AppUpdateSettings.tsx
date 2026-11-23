@@ -41,7 +41,7 @@ export function AppUpdateSettings({ updates }: { updates: ReturnType<typeof useA
       {info?.hasUpdate && status !== "downloaded" && (
         <p className="settings-update__hint">
           {info.assetName
-            ? `安装包${info.assetSize ? ` ${formatDownloadSize(info.assetSize)}` : ""} · 保存到下载目录中的 doTime 文件夹`
+            ? `安装包${info.assetSize ? ` ${formatDownloadSize(info.assetSize)}` : ""} · 保存到下载目录中的 betime 文件夹`
             : "暂未提供适合当前系统的安装包，请前往 GitHub 发布页选择下载。"}
         </p>
       )}

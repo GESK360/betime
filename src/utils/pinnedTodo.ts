@@ -1,21 +1,21 @@
 import type { Todo, Urgency } from "../types";
 
-export const PINNED_TODO_EVENT = "dotime-pinned-todo";
+export const PINNED_TODO_EVENT = "betime-pinned-todo";
 
 export function pinnedTodoEventForSlot(slot: string) {
   return `${PINNED_TODO_EVENT}-${slot}`;
 }
 
 export function pinnedSubtasksExpandedEventForSlot(slot: string) {
-  return `dotime-pinned-subtasks-expanded-${slot}`;
+  return `betime-pinned-subtasks-expanded-${slot}`;
 }
 
 export function pinnedSubtasksStateRequestEventForSlot(slot: string) {
-  return `dotime-pinned-subtasks-request-state-${slot}`;
+  return `betime-pinned-subtasks-request-state-${slot}`;
 }
 
 export function pinnedSubtasksMovingEventForSlot(slot: string) {
-  return `dotime-pinned-subtasks-moving-${slot}`;
+  return `betime-pinned-subtasks-moving-${slot}`;
 }
 
 export type PinnedTodoPayload = {

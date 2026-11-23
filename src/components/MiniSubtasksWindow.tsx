@@ -328,10 +328,10 @@ export function MiniSubtasksWindow() {
     };
 
     window.addEventListener("storage", handleStorage);
-    window.addEventListener("dotime-app-data-updated", handleAppDataUpdated);
+    window.addEventListener("betime-app-data-updated", handleAppDataUpdated);
     return () => {
       window.removeEventListener("storage", handleStorage);
-      window.removeEventListener("dotime-app-data-updated", handleAppDataUpdated);
+      window.removeEventListener("betime-app-data-updated", handleAppDataUpdated);
     };
   }, [activeTodoId]);
 

@@ -179,7 +179,7 @@ export function ClipboardWindow() {
 
     void import("@tauri-apps/api/event")
       .then(({ listen }) =>
-        listen("dotime-clipboard-closed", () => {
+        listen("betime-clipboard-closed", () => {
           if (!cancelled) setEnabled(false);
         }),
       )
@@ -268,7 +268,7 @@ export function ClipboardWindow() {
         );
 
         unlisten = await listen<ClipboardSnapshot>(
-          "dotime-clipboard-changed",
+          "betime-clipboard-changed",
           (event) => {
             if (!enabledRef.current) return;
             const incomingFingerprint = getClientFingerprint(event.payload);

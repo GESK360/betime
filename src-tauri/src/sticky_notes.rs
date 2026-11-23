@@ -19,7 +19,7 @@ static NOTES_CACHE: Mutex<Option<NoteRepository>> = Mutex::new(None);
 static WINDOW_BUILD_LOCK: Mutex<()> = Mutex::new(());
 static NEXT_ID: AtomicU64 = AtomicU64::new(0);
 const COLORS: &[&str] = &["yellow", "green", "pink", "purple", "blue", "gray", "dark"];
-const CHANGED_EVENT: &str = "dotime-sticky-notes-changed";
+const CHANGED_EVENT: &str = "betime-sticky-notes-changed";
 const MAX_HTML_BYTES: usize = 24 * 1024 * 1024;
 
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
@@ -191,7 +191,7 @@ fn show_window(app: &tauri::AppHandle, note: &StickyNote, focus: bool) -> Result
                 &window_label,
                 WebviewUrl::App(format!("index.html?view=sticky-note&noteId={}", note.id).into()),
             )
-            .title("doTime 便签")
+            .title("betime 便签")
             .decorations(false)
             .transparent(false)
             .shadow(true)

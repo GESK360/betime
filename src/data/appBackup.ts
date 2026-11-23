@@ -17,7 +17,7 @@ import {
 import { copyTodoImages, persistTodoImages } from "../utils/todoImages";
 
 export interface AppBackup {
-  format: "dotime-backup";
+  format: "betime-backup";
   version: 1;
   exportedAt: number;
   appData: AppDataDocument;
@@ -50,10 +50,10 @@ export function parseAppBackup(text: string): ParseBackupResult {
   try {
     value = JSON.parse(text.replace(/^\uFEFF/, "")) as unknown;
   } catch {
-    return { ok: false, error: "请选择 doTime 导出的 JSON 备份；TXT 阅读文档不能用于恢复。" };
+    return { ok: false, error: "请选择 betime 导出的 JSON 备份；TXT 阅读文档不能用于恢复。" };
   }
-  if (isRecord(value) && value.format === "dotime-backup") {
-    if (value.version !== 1) return { ok: false, error: "暂不支持这个版本的备份，请更新 doTime 后重试。" };
+  if (isRecord(value) && (value.format === "betime-backup" || value.format === "dotime-backup")) {
+    if (value.version !== 1) return { ok: false, error: "暂不支持这个版本的备份，请更新 betime 后重试。" };
     const parsed = parseImportedAppData(JSON.stringify(value.appData));
     const templates = parseTaskTemplates(value.templates);
     if (!parsed.ok || templates == null ||
@@ -78,7 +78,7 @@ export function parseAppBackup(text: string): ParseBackupResult {
     return { ok: true, backup: { appData: parsed.data, templates, exportedAt: value.exportedAt, legacy: false } };
   }
   if (isRecord(value) && "format" in value) {
-    return { ok: false, error: "这不是 doTime 备份文件。" };
+    return { ok: false, error: "这不是 betime 备份文件。" };
   }
   const legacy = parseImportedAppData(JSON.stringify(value));
   return legacy.ok
@@ -109,7 +109,7 @@ export async function createAppBackup(
   const trash = [];
   for (const entry of data.trash ?? []) trash.push({ ...entry, todo: await exportTodo(entry.todo) });
   return {
-    format: "dotime-backup",
+    format: "betime-backup",
     version: 1,
     exportedAt,
     appData: { ...data, todos, trash },

@@ -18,8 +18,8 @@ foreach ($count in $Counts) {
     $casePath = Join-Path $outputPath "notes-$count"
     if (Test-Path -LiteralPath $casePath) { throw "Use a new output directory; the fixture never overwrites an existing case: $casePath" }
     New-Item -ItemType Directory -Path $casePath | Out-Null
-    $env:DOTIME_BENCH_DIR = $casePath
-    $env:DOTIME_BENCH_COUNT = "$count"
+    $env:BETIME_BENCH_DIR = $casePath
+    $env:BETIME_BENCH_COUNT = "$count"
     $process = Start-Process -FilePath $executablePath -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $casePath 'stdout.log') -RedirectStandardError (Join-Path $casePath 'stderr.log')
     $samples = @()
     $previousCpu = @{}
@@ -78,8 +78,8 @@ foreach ($count in $Counts) {
         if (-not $process.HasExited) {
             foreach ($processId in $ids) { Stop-Process -Id $processId -ErrorAction SilentlyContinue }
         }
-        Remove-Item Env:DOTIME_BENCH_DIR -ErrorAction SilentlyContinue
-        Remove-Item Env:DOTIME_BENCH_COUNT -ErrorAction SilentlyContinue
+        Remove-Item Env:BETIME_BENCH_DIR -ErrorAction SilentlyContinue
+        Remove-Item Env:BETIME_BENCH_COUNT -ErrorAction SilentlyContinue
     }
     $phases = @{}
     foreach ($phase in @('idle', 'editing', 'settled', 'half-closed')) {

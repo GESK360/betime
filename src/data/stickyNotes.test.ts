@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { clearMocks, mockIPC } from "@tauri-apps/api/mocks";
 import { deleteStickyNote, getStickyNote, listStickyNotes, listStickyNoteSummaries, STICKY_NOTES_CHANGED_EVENT, updateStickyNote, type StickyNote } from "./stickyNotes";
 
-const storageKey = "dotime-sticky-notes-v1";
+const storageKey = "betime-sticky-notes-v1";
 const makeNote = (id: string): StickyNote => ({
   id, html: `<b>${id}</b>`, color: "yellow", pinned: false, open: true, createdAt: 1, updatedAt: 1,
 });

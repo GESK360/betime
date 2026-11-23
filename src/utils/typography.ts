@@ -5,7 +5,7 @@ export interface TypographySettings {
   fontSize: number;
 }
 
-export const TYPOGRAPHY_STORAGE_KEY = "dotime-typography";
+export const TYPOGRAPHY_STORAGE_KEY = "betime-typography";
 export const FONT_SIZE_MIN = 12;
 export const FONT_SIZE_MAX = 24;
 export const DEFAULT_TYPOGRAPHY: TypographySettings = {

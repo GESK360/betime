@@ -1,6 +1,6 @@
 export type ThemeMode = "dark" | "light";
 
-const STORAGE_KEY = "dotime-theme";
+const STORAGE_KEY = "betime-theme";
 
 export function loadTheme(): ThemeMode {
   try {

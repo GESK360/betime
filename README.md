@@ -1,16 +1,13 @@
-# doTime
+# betime
 
-这个是dotime的fork
-这个是dotime的fork
-这个是dotime的fork
+> 本项目为 [996wuxian/DoTime](https://github.com/996wuxian/DoTime) 的自用 Fork（原名 `doTime`），已独立重命名为 `betime`（独立应用标识符 `com.gesk360.betime`、独立数据目录、独立单实例锁与端口），可与原版 `doTime` 同时安装并并行运行，互不冲突，且支持直接导入 `doTime` 导出的 JSON 备份。
+>
+> **Fork 优化与修复：**
+> - 待办评论最右侧新增编辑评论图标按钮，并支持双击评论快速进入编辑
+> - 评论编辑模式下点击空白处自动保存并退出编辑模式
+> - 修复待办固定窗口（及其子待办窗口）在显示/置顶时不透明度设置不生效的问题
 
-自用
-
-
-
-
-
-doTime 是一款基于 **Tauri 2 + React 19 + TypeScript** 的本地桌面待办与计时应用。它把每日待办、倒计时、耗时统计、计划视图、日复盘、搜索、收藏、模板和本地数据导出放在一个轻量窗口里，适合需要持续跟踪工作节奏的人。
+betime 是一款基于 **Tauri 2 + React 19 + TypeScript** 的本地桌面待办与计时应用。它把每日待办、倒计时、耗时统计、计划视图、日复盘、搜索、收藏、模板和本地数据导出放在一个轻量窗口里，适合需要持续跟踪工作节奏的人。
 
 ## 每日待办与倒计时
 
@@ -78,7 +75,7 @@ doTime 是一款基于 **Tauri 2 + React 19 + TypeScript** 的本地桌面待办
 
 ## 数据说明
 
-doTime 不依赖 MySQL、PostgreSQL、SQLite 等数据库，也不需要安装额外的数据服务。
+betime 不依赖 MySQL、PostgreSQL、SQLite 等数据库，也不需要安装额外的数据服务。
 
 - 主数据使用版本化的浏览器 `localStorage` 文档保存
 - 主数据损坏时会尝试从最近 3 份有效快照恢复

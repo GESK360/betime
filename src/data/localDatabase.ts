@@ -5,7 +5,7 @@ let databasePromise: Promise<IDBDatabase> | null = null;
 function openDatabase(): Promise<IDBDatabase> {
   if (databasePromise != null) return databasePromise;
   databasePromise = new Promise((resolve, reject) => {
-    const request = indexedDB.open("dotime-local-data", 1);
+    const request = indexedDB.open("betime-local-data", 1);
     request.onupgradeneeded = () => {
       for (const name of ["drafts", "images", "backups"] as const) {
         if (!request.result.objectStoreNames.contains(name)) {
@@ -21,7 +21,7 @@ function openDatabase(): Promise<IDBDatabase> {
       resolve(request.result);
     };
     request.onerror = () => reject(request.error);
-    request.onblocked = () => reject(new Error("本地存储被其他窗口占用，请关闭其他 doTime 窗口后重试。"));
+    request.onblocked = () => reject(new Error("本地存储被其他窗口占用，请关闭其他 betime 窗口后重试。"));
   });
   void databasePromise.catch(() => { databasePromise = null; });
   return databasePromise;

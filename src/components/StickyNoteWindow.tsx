@@ -192,7 +192,7 @@ export function StickyNoteWindow() {
     <main
       className="sticky-note"
       data-note-color={note?.color ?? "yellow"}
-      aria-label="doTime 便签"
+      aria-label="betime 便签"
       onKeyDown={(event) => {
         if (deleteTarget) {
           if (event.key === "Escape") { event.preventDefault(); cancelDelete(); }

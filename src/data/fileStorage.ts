@@ -48,7 +48,7 @@ const TASK_TEMPLATE_STORAGE_KEYS = [
   TASK_TEMPLATE_STORAGE_KEY,
   TASK_TEMPLATE_BACKUP_KEY,
 ];
-export const FILE_STORAGE_RELOADED_EVENT = "dotime-file-storage-reloaded";
+export const FILE_STORAGE_RELOADED_EVENT = "betime-file-storage-reloaded";
 
 let initialized = false;
 let mirrorQueue: Promise<void> = Promise.resolve();

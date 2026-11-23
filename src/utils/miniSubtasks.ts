@@ -22,11 +22,11 @@ export type MiniSubtasksGroup = {
   updatedAt: number;
 };
 
-export const MINI_SUBTASKS_GROUP_EVENT = "dotime-mini-subtasks-group";
-export const MINI_SUBTASKS_CLOSED_EVENT = "dotime-mini-subtasks-closed";
+export const MINI_SUBTASKS_GROUP_EVENT = "betime-mini-subtasks-group";
+export const MINI_SUBTASKS_CLOSED_EVENT = "betime-mini-subtasks-closed";
 export const MINI_SUBTASKS_VISIBILITY_EVENT =
-  "dotime-mini-subtasks-visibility";
-export const MINI_SUBTASKS_HOVER_EVENT = "dotime-mini-subtasks-hover";
+  "betime-mini-subtasks-visibility";
+export const MINI_SUBTASKS_HOVER_EVENT = "betime-mini-subtasks-hover";
 
 type ParsedMiniSubtasksGroup = {
   todoId: string;
