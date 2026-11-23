@@ -122,7 +122,7 @@ jobs:
         with:
           tauriScript: npm run tauri:cli --
           tagName: ${{ steps.version.outputs.tag }}
-          releaseName: betime ${{ steps.version.outputs.tag }}
+          releaseName: betime${{ steps.version.outputs.version }}
           releaseBody: Automated release from package.json version ${{ steps.version.outputs.version }}.
           releaseDraft: false
           prerelease: ${{ contains(steps.version.outputs.version, '-') }}
