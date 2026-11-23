@@ -599,6 +599,21 @@ fn cleanup_todo_images(
     })
 }
 
+fn record_window_opacity(
+    state: &WindowOpacityState,
+    label: &str,
+    opacity: Option<f64>,
+) -> Result<(), String> {
+    let Some(opacity) = opacity.filter(|value| value.is_finite()) else {
+        return Ok(());
+    };
+    state.0.lock().map_err(|error| error.to_string())?.insert(
+        label.to_string(),
+        opacity.clamp(MINI_OPACITY_MIN, MINI_OPACITY_MAX),
+    );
+    Ok(())
+}
+
 #[tauri::command]
 fn set_window_opacity(
     window: tauri::Window,
@@ -609,12 +624,12 @@ fn set_window_opacity(
         return Err("invalid window opacity".into());
     }
     let opacity = opacity.clamp(MINI_OPACITY_MIN, MINI_OPACITY_MAX);
-    set_native_window_opacity(&window, opacity)?;
     state
         .0
         .lock()
         .map_err(|error| error.to_string())?
         .insert(window.label().to_string(), opacity);
+    set_native_window_opacity(&window, opacity)?;
     Ok(())
 }
 
@@ -839,6 +854,7 @@ async fn show_pinned_todo_window(
 
     let _ = window.unminimize();
     let _ = window.set_always_on_top(always_on_top);
+    let _ = restore_window_opacity(&window);
     let _ = window.set_background_color(Some(Color(0, 0, 0, 0)));
     app.state::<PinnedDockState>()
         .0
@@ -856,8 +872,10 @@ async fn show_pinned_todo_window(
 fn pinned_todo_window_ready(
     app: tauri::AppHandle,
     state: State<'_, PinnedTodoState>,
+    opacity_state: State<'_, WindowOpacityState>,
     slot: String,
     todo_id: String,
+    opacity: Option<f64>,
 ) -> Result<(), String> {
     let active = state.0.lock().map_err(|error| error.to_string())?;
     let matches = active
@@ -866,9 +884,11 @@ fn pinned_todo_window_ready(
         .is_some_and(|todo| todo["id"].as_str() == Some(todo_id.as_str()));
     drop(active);
     if matches {
-        if let Some(window) = app.get_webview_window(&format!("pinned-todo-{slot}")) {
-            restore_window_opacity(&window)?;
+        let label = format!("pinned-todo-{slot}");
+        record_window_opacity(&opacity_state, &label, opacity)?;
+        if let Some(window) = app.get_webview_window(&label) {
             window.show().map_err(|error| error.to_string())?;
+            restore_window_opacity(&window)?;
         }
     }
     Ok(())
@@ -1088,6 +1108,7 @@ async fn show_pinned_subtasks_window(
     let _ = app.emit(PINNED_LAYOUT_UPDATED_EVENT, ());
     let _ = window.unminimize();
     let _ = window.set_always_on_top(always_on_top);
+    let _ = restore_window_opacity(&window);
     let _ = window.set_background_color(Some(Color(0, 0, 0, 0)));
     let _ = window.emit(
         format!("dotime-pinned-subtasks-{slot}").as_str(),
@@ -1100,8 +1121,10 @@ async fn show_pinned_subtasks_window(
 fn pinned_subtasks_window_ready(
     app: tauri::AppHandle,
     state: State<'_, PinnedSubtasksState>,
+    opacity_state: State<'_, WindowOpacityState>,
     slot: String,
     todo_id: String,
+    opacity: Option<f64>,
 ) -> Result<(), String> {
     let active = state.0.lock().map_err(|error| error.to_string())?;
     let matches = active
@@ -1113,10 +1136,11 @@ fn pinned_subtasks_window_ready(
     }
     drop(active);
     let window_label = pinned_subtasks_window_label(slot.parse::<usize>().unwrap_or(0));
+    record_window_opacity(&opacity_state, &window_label, opacity)?;
     if let Some(window) = app.get_webview_window(&window_label) {
         let _ = window.unminimize();
-        restore_window_opacity(&window)?;
         window.show().map_err(|error| error.to_string())?;
+        restore_window_opacity(&window)?;
     }
     Ok(())
 }
@@ -2849,7 +2873,9 @@ fn set_native_window_opacity(window: &tauri::Window, opacity: f64) -> Result<(),
 
     unsafe {
         let extended_style = GetWindowLongW(hwnd, GWL_EXSTYLE);
-        SetWindowLongW(hwnd, GWL_EXSTYLE, extended_style | WS_EX_LAYERED);
+        if (extended_style & WS_EX_LAYERED) == 0 {
+            SetWindowLongW(hwnd, GWL_EXSTYLE, extended_style | WS_EX_LAYERED);
+        }
         if SetLayeredWindowAttributes(hwnd, 0, alpha, LWA_ALPHA) == 0 {
             return Err("failed to set layered window opacity".into());
         }

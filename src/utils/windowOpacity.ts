@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
+import { emit, listen } from "@tauri-apps/api/event";
 
 export const WINDOW_OPACITY_STORAGE_KEY = "dotime:window-opacity";
 export const WINDOW_OPACITY_CHANGE_EVENT = "dotime-window-opacity-changed";
@@ -41,7 +42,68 @@ export function saveWindowOpacity(opacity: number) {
       detail: nextOpacity,
     }),
   );
+  try {
+    void emit(WINDOW_OPACITY_CHANGE_EVENT, { opacity: nextOpacity }).catch(
+      () => {
+        /* browser */
+      },
+    );
+  } catch {
+    /* browser */
+  }
   return nextOpacity;
+}
+
+export function subscribeWindowOpacity(
+  onChange: (opacity: number) => void,
+): () => void {
+  const emitOpacity = (value: unknown) => {
+    if (typeof value === "number" && Number.isFinite(value)) {
+      onChange(clampWindowOpacity(value));
+    }
+  };
+  const handleStorage = (event: StorageEvent) => {
+    if (event.key === WINDOW_OPACITY_STORAGE_KEY || event.key == null) {
+      onChange(loadWindowOpacity());
+    }
+  };
+  const handleOpacityChange = (event: Event) => {
+    emitOpacity((event as CustomEvent<number>).detail);
+  };
+
+  window.addEventListener("storage", handleStorage);
+  window.addEventListener(WINDOW_OPACITY_CHANGE_EVENT, handleOpacityChange);
+
+  let disposed = false;
+  let unlistenTauri: (() => void) | undefined;
+  try {
+    void listen<{ opacity?: number }>(WINDOW_OPACITY_CHANGE_EVENT, (event) => {
+      if (disposed) return;
+      emitOpacity(event.payload?.opacity);
+    })
+      .then((unlisten) => {
+        if (disposed) {
+          unlisten();
+        } else {
+          unlistenTauri = unlisten;
+        }
+      })
+      .catch(() => {
+        /* browser */
+      });
+  } catch {
+    /* browser */
+  }
+
+  return () => {
+    disposed = true;
+    window.removeEventListener("storage", handleStorage);
+    window.removeEventListener(
+      WINDOW_OPACITY_CHANGE_EVENT,
+      handleOpacityChange,
+    );
+    unlistenTauri?.();
+  };
 }
 
 export function adjustWindowOpacity(opacity: number, direction: -1 | 1) {
@@ -66,37 +128,14 @@ export function useWindowOpacity(wheelTarget?: OpacityWheelTarget) {
   }, [opacity]);
 
   useEffect(() => {
-    const applyStoredOpacity = () => {
-      const nextOpacity = loadWindowOpacity();
+    return subscribeWindowOpacity((nextOpacity) => {
+      const unchanged = opacityRef.current === nextOpacity;
       opacityRef.current = nextOpacity;
       setOpacity(nextOpacity);
-    };
-    const handleStorage = (event: StorageEvent) => {
-      if (
-        event.key === WINDOW_OPACITY_STORAGE_KEY ||
-        event.key == null
-      ) {
-        applyStoredOpacity();
+      if (unchanged) {
+        void setWindowOpacity(nextOpacity);
       }
-    };
-    const handleOpacityChange = (event: Event) => {
-      const nextOpacity = (event as CustomEvent<number>).detail;
-      if (typeof nextOpacity === "number" && Number.isFinite(nextOpacity)) {
-        const clampedOpacity = clampWindowOpacity(nextOpacity);
-        opacityRef.current = clampedOpacity;
-        setOpacity(clampedOpacity);
-      }
-    };
-
-    window.addEventListener("storage", handleStorage);
-    window.addEventListener(WINDOW_OPACITY_CHANGE_EVENT, handleOpacityChange);
-    return () => {
-      window.removeEventListener("storage", handleStorage);
-      window.removeEventListener(
-        WINDOW_OPACITY_CHANGE_EVENT,
-        handleOpacityChange,
-      );
-    };
+    });
   }, []);
 
   useEffect(() => {

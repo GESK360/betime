@@ -15,10 +15,9 @@ import { IconClose, IconMinus, IconPlus, IconSettings } from "./icons";
 import {
   loadWindowOpacity,
   saveWindowOpacity,
-  WINDOW_OPACITY_CHANGE_EVENT,
+  subscribeWindowOpacity,
   WINDOW_OPACITY_MAX,
   WINDOW_OPACITY_MIN,
-  WINDOW_OPACITY_STORAGE_KEY,
 } from "../utils/windowOpacity";
 import "./SettingsButton.css";
 
@@ -40,22 +39,13 @@ function SettingsDialog({ onClose, updates }: {
       if (event.key === TYPOGRAPHY_STORAGE_KEY || event.key == null) {
         setSettings(loadTypographySettings());
       }
-      if (event.key === WINDOW_OPACITY_STORAGE_KEY || event.key == null) {
-        setWindowOpacity(loadWindowOpacity());
-      }
     };
-    const handleOpacityChange = (event: Event) => {
-      const nextOpacity = (event as CustomEvent<number>).detail;
-      if (typeof nextOpacity === "number" && Number.isFinite(nextOpacity)) {
-        setWindowOpacity(nextOpacity);
-      }
-    };
+    const unsubscribeOpacity = subscribeWindowOpacity(setWindowOpacity);
     window.addEventListener("storage", handleStorage);
-    window.addEventListener(WINDOW_OPACITY_CHANGE_EVENT, handleOpacityChange);
     return () => {
       dialog?.close();
       window.removeEventListener("storage", handleStorage);
-      window.removeEventListener(WINDOW_OPACITY_CHANGE_EVENT, handleOpacityChange);
+      unsubscribeOpacity();
     };
   }, []);
 

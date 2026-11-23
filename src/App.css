@@ -6954,6 +6954,15 @@ a,
   background: rgba(148, 163, 184, 0.08);
   font-size: 0.84rem;
   line-height: 1.55;
+  transition: background 0.15s ease;
+}
+
+.todo-item__comment:hover {
+  background: rgba(148, 163, 184, 0.12);
+}
+
+.todo-item__comment > svg {
+  flex-shrink: 0;
 }
 
 .todo-item__comment p {
@@ -6962,6 +6971,15 @@ a,
   margin: 0;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+}
+
+.todo-item__comment-edit {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  border-radius: 6px;
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
 .btn-drag-handle {

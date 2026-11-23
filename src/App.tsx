@@ -93,8 +93,7 @@ import {
   loadWindowOpacity,
   saveWindowOpacity,
   setWindowOpacity,
-  WINDOW_OPACITY_CHANGE_EVENT,
-  WINDOW_OPACITY_STORAGE_KEY,
+  subscribeWindowOpacity,
 } from "./utils/windowOpacity";
 import "./App.css";
 
@@ -971,25 +970,7 @@ function App() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [aboutOpen]);
 
-  useEffect(() => {
-    const handleStorage = (event: StorageEvent) => {
-      if (event.key === WINDOW_OPACITY_STORAGE_KEY || event.key == null) {
-        setMiniOpacity(loadWindowOpacity());
-      }
-    };
-    const handleOpacityChange = (event: Event) => {
-      const nextOpacity = (event as CustomEvent<number>).detail;
-      if (typeof nextOpacity === "number" && Number.isFinite(nextOpacity)) {
-        setMiniOpacity(nextOpacity);
-      }
-    };
-    window.addEventListener("storage", handleStorage);
-    window.addEventListener(WINDOW_OPACITY_CHANGE_EVENT, handleOpacityChange);
-    return () => {
-      window.removeEventListener("storage", handleStorage);
-      window.removeEventListener(WINDOW_OPACITY_CHANGE_EVENT, handleOpacityChange);
-    };
-  }, []);
+  useEffect(() => subscribeWindowOpacity(setMiniOpacity), []);
 
   useEffect(() => {
     if (miniMode) void setWindowOpacity(miniOpacity);

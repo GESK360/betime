@@ -35,7 +35,7 @@ import {
   type PinnedTodoPayload,
 } from "../utils/pinnedTodo";
 import { formatDuration } from "../utils/time";
-import { useWindowOpacity } from "../utils/windowOpacity";
+import { loadWindowOpacity, useWindowOpacity } from "../utils/windowOpacity";
 import {
   IconBell,
   IconCheck,
@@ -524,7 +524,11 @@ export function PinnedTodoWindow() {
   }), [slot, todo?.id, todo?.subtaskTotal, expanded, layoutRevision]);
   const notifyReady = useCallback(async () => {
     const { invoke } = await import("@tauri-apps/api/core");
-    await invoke("pinned_todo_window_ready", { slot, todoId: todo?.id });
+    await invoke("pinned_todo_window_ready", {
+      slot,
+      todoId: todo?.id,
+      opacity: loadWindowOpacity(),
+    });
   }, [slot, todo?.id]);
   usePinnedWindowFrame({
     shellRef, identity: todo ? `${todo.id}:${presentation}` : undefined,

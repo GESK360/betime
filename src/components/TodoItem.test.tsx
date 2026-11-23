@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import { TodoItem } from "./TodoItem";
+import { attachCommentOutsideAutoSave, TodoItem } from "./TodoItem";
 import type { Todo, TodoSubtask } from "../types";
 import type { ComponentProps } from "react";
 
@@ -81,5 +81,62 @@ describe("简洁任务卡片", () => {
     expect(html).not.toContain("已完成待办详情");
     expect(html).toContain('aria-label="已收藏"');
     expect(html).toContain('aria-label="已固定到窗口"');
+  });
+
+  it("有评论且未收起时在评论最右侧渲染编辑评论按钮，并支持双击编辑提示", () => {
+    const html = render({ comment: "保留付款回执" });
+    expect(html).toContain('title="双击编辑评论"');
+    expect(html).toContain('aria-label="编辑评论"');
+    expect(html.indexOf('aria-label="编辑评论"')).toBeGreaterThan(
+      html.indexOf("保留付款回执"),
+    );
+
+    const noCommentHtml = render({ comment: "" });
+    expect(noCommentHtml).not.toContain('aria-label="编辑评论"');
+
+    const collapsedCompletedHtml = render({
+      completed: true,
+      completedAt: now,
+      comment: "保留付款回执",
+    });
+    expect(collapsedCompletedHtml).not.toContain('aria-label="编辑评论"');
+  });
+
+  it("评论编辑模式下点击空白处自动保存并退出，点击编辑器内部或右键不触发", () => {
+    const doc = new EventTarget();
+    const insideNode = {} as Node;
+    const outsideNode = {} as Node;
+    const editor = {
+      contains: (node: Node | null) => node === insideNode,
+    };
+    const onAutoSave = vi.fn();
+
+    const detach = attachCommentOutsideAutoSave(doc, () => editor, onAutoSave);
+
+    const dispatchPointerDown = (
+      target: Node,
+      init: { button?: number; pointerType?: string } = {},
+    ) => {
+      const event = new Event("pointerdown");
+      Object.defineProperty(event, "target", { value: target });
+      Object.defineProperty(event, "button", { value: init.button ?? 0 });
+      Object.defineProperty(event, "pointerType", {
+        value: init.pointerType ?? "mouse",
+      });
+      doc.dispatchEvent(event);
+    };
+
+    dispatchPointerDown(insideNode);
+    expect(onAutoSave).not.toHaveBeenCalled();
+
+    dispatchPointerDown(outsideNode, { button: 2, pointerType: "mouse" });
+    expect(onAutoSave).not.toHaveBeenCalled();
+
+    dispatchPointerDown(outsideNode, { button: 0, pointerType: "mouse" });
+    expect(onAutoSave).toHaveBeenCalledTimes(1);
+
+    detach();
+    dispatchPointerDown(outsideNode, { button: 0, pointerType: "mouse" });
+    expect(onAutoSave).toHaveBeenCalledTimes(1);
   });
 });

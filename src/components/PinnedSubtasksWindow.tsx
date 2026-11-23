@@ -23,7 +23,7 @@ import {
 } from "../utils/pinnedTodo";
 import type { Todo } from "../types";
 import { URGENCY_LABELS } from "../types";
-import { useWindowOpacity } from "../utils/windowOpacity";
+import { loadWindowOpacity, useWindowOpacity } from "../utils/windowOpacity";
 import { formatDuration, formatDurationHuman } from "../utils/time";
 import {
   IconCheck,
@@ -520,7 +520,11 @@ export function PinnedSubtasksWindow() {
   );
   const notifyReady = useCallback(async () => {
     const { invoke } = await import("@tauri-apps/api/core");
-    await invoke("pinned_subtasks_window_ready", { slot, todoId: group?.todoId });
+    await invoke("pinned_subtasks_window_ready", {
+      slot,
+      todoId: group?.todoId,
+      opacity: loadWindowOpacity(),
+    });
     setFrameReady(true);
   }, [slot, group?.todoId]);
   usePinnedWindowFrame({

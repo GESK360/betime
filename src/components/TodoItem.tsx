@@ -77,6 +77,37 @@ interface TodoItemProps {
   onDragHandlePointerDown: (event: PointerEvent<HTMLButtonElement>) => void;
 }
 
+export function attachCommentOutsideAutoSave(
+  targetDoc: Pick<Document, "addEventListener" | "removeEventListener">,
+  getEditor: () => { contains(node: Node | null): boolean } | null,
+  onAutoSave: () => void,
+): () => void {
+  const handleOutsidePointerDown = (event: Event) => {
+    const pointerEvent = event as globalThis.PointerEvent;
+    if (pointerEvent.pointerType === "mouse" && pointerEvent.button !== 0) {
+      return;
+    }
+    const editor = getEditor();
+    if (editor == null) return;
+    const target = pointerEvent.target;
+    if (typeof Node !== "undefined") {
+      if (target instanceof Node && editor.contains(target)) return;
+    } else if (target != null && editor.contains(target as Node)) {
+      return;
+    }
+    onAutoSave();
+  };
+
+  targetDoc.addEventListener("pointerdown", handleOutsidePointerDown, {
+    capture: true,
+  });
+  return () => {
+    targetDoc.removeEventListener("pointerdown", handleOutsidePointerDown, {
+      capture: true,
+    });
+  };
+}
+
 function formatReminderMeta(dateKey: string, time: string) {
   const today = formatDateKey();
   const tomorrowDate = new Date();
@@ -549,6 +580,11 @@ export function TodoItem({
   );
   const [commentEditorOpen, setCommentEditorOpen] = useState(false);
   const [commentDraft, setCommentDraft] = useState(todo.comment ?? "");
+  const commentEditorRef = useRef<HTMLDivElement | null>(null);
+  const commentDraftRef = useRef(commentDraft);
+  commentDraftRef.current = commentDraft;
+  const onUpdateCommentRef = useRef(onUpdateComment);
+  onUpdateCommentRef.current = onUpdateComment;
   const countdownEnabled = todo.countdownEnabled;
   const countdownOnlyEnabled = Boolean(
     countdownEnabled && todo.countdownOnlyEnabled,
@@ -612,6 +648,18 @@ export function TodoItem({
     onUpdateComment(commentDraft);
     setCommentEditorOpen(false);
   };
+
+  useEffect(() => {
+    if (!commentEditorOpen) return;
+    return attachCommentOutsideAutoSave(
+      document,
+      () => commentEditorRef.current,
+      () => {
+        onUpdateCommentRef.current(commentDraftRef.current);
+        setCommentEditorOpen(false);
+      },
+    );
+  }, [commentEditorOpen]);
 
   useEffect(() => {
     const container = imageListRef.current;
@@ -1081,7 +1129,7 @@ export function TodoItem({
       )}
     </article>
     {commentEditorOpen && (
-      <div className="todo-item__comment-editor">
+      <div ref={commentEditorRef} className="todo-item__comment-editor">
         <textarea
           value={commentDraft}
           onChange={(event) => setCommentDraft(event.target.value)}
@@ -1111,9 +1159,26 @@ export function TodoItem({
     )}
 
       {!commentEditorOpen && todoComment && !detailsCollapsed && (
-        <div className="todo-item__comment">
+        <div
+          className="todo-item__comment"
+          onDoubleClick={(event) => {
+            event.stopPropagation();
+            handleOpenCommentEditor();
+          }}
+          title="双击编辑评论"
+        >
           <IconMessageCircle size={14} />
           <p>{todoComment}</p>
+          <button
+            type="button"
+            className="btn btn-ghost btn-icon-only btn-edit todo-item__comment-edit"
+            onClick={handleOpenCommentEditor}
+            onDoubleClick={(event) => event.stopPropagation()}
+            aria-label="编辑评论"
+            title="编辑评论"
+          >
+            <IconPencil size={14} />
+          </button>
         </div>
       )}
       {activeImage && (

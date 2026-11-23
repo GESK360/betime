@@ -200,6 +200,20 @@ mod tests {
         ) -> *mut c_void;
         fn DestroyWindow(hwnd: *mut c_void) -> i32;
         fn GetClientRect(hwnd: *mut c_void, rect: *mut Rect) -> i32;
+        fn GetWindowLongW(hwnd: *mut c_void, index: i32) -> i32;
+        fn SetWindowLongW(hwnd: *mut c_void, index: i32, new_long: i32) -> i32;
+        fn SetLayeredWindowAttributes(
+            hwnd: *mut c_void,
+            color_key: u32,
+            alpha: u8,
+            flags: u32,
+        ) -> i32;
+        fn GetLayeredWindowAttributes(
+            hwnd: *mut c_void,
+            color_key: *mut u32,
+            alpha: *mut u8,
+            flags: *mut u32,
+        ) -> i32;
     }
 
     struct HiddenWindow(*mut c_void);
@@ -361,6 +375,71 @@ mod tests {
                     }
                 }
             }
+        }
+    }
+
+    #[test]
+    fn native_layered_opacity_persists_before_and_after_clip() {
+        const GWL_EXSTYLE: i32 = -20;
+        const WS_EX_LAYERED: i32 = 0x0008_0000;
+        const LWA_ALPHA: u32 = 0x0000_0002;
+
+        unsafe {
+            let class: Vec<u16> = "STATIC\0".encode_utf16().collect();
+            let hwnd = HiddenWindow(CreateWindowExW(
+                0,
+                class.as_ptr(),
+                std::ptr::null(),
+                0x80000000,
+                0,
+                0,
+                420,
+                1040,
+                std::ptr::null_mut(),
+                std::ptr::null_mut(),
+                std::ptr::null_mut(),
+                std::ptr::null_mut(),
+            ));
+            assert!(
+                !hwnd.0.is_null(),
+                "could not create hidden native test window"
+            );
+
+            let extended_style = GetWindowLongW(hwnd.0, GWL_EXSTYLE);
+            SetWindowLongW(hwnd.0, GWL_EXSTYLE, extended_style | WS_EX_LAYERED);
+            assert_ne!(SetLayeredWindowAttributes(hwnd.0, 0, 153, LWA_ALPHA), 0);
+
+            let clip = Rect {
+                left: 210,
+                top: 18,
+                right: 420,
+                bottom: 64,
+            };
+            assert!(apply_clip(hwnd.0, clip, 12).unwrap());
+
+            let style_after_clip = GetWindowLongW(hwnd.0, GWL_EXSTYLE);
+            assert_ne!(style_after_clip & WS_EX_LAYERED, 0);
+
+            let mut color_key = 0u32;
+            let mut alpha = 0u8;
+            let mut flags = 0u32;
+            assert_ne!(
+                GetLayeredWindowAttributes(hwnd.0, &mut color_key, &mut alpha, &mut flags),
+                0
+            );
+            assert_eq!(flags, LWA_ALPHA);
+            assert_eq!(alpha, 153);
+
+            let mut region = Rect::default();
+            assert_ne!(GetWindowRgnBox(hwnd.0, &mut region), 0);
+            assert_eq!(region, clip);
+
+            assert_ne!(SetLayeredWindowAttributes(hwnd.0, 0, 204, LWA_ALPHA), 0);
+            assert_ne!(
+                GetLayeredWindowAttributes(hwnd.0, &mut color_key, &mut alpha, &mut flags),
+                0
+            );
+            assert_eq!(alpha, 204);
         }
     }
 }
