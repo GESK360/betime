@@ -1,5 +1,15 @@
 # doTime
 
+这个是dotime的fork
+这个是dotime的fork
+这个是dotime的fork
+
+自用
+
+
+
+
+
 doTime 是一款基于 **Tauri 2 + React 19 + TypeScript** 的本地桌面待办与计时应用。它把每日待办、倒计时、耗时统计、计划视图、日复盘、搜索、收藏、模板和本地数据导出放在一个轻量窗口里，适合需要持续跟踪工作节奏的人。
 
 ## 每日待办与倒计时
